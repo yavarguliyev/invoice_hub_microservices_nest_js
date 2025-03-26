@@ -1,0 +1,4 @@
+packages:
+  - 'api-gateway'
+  - 'common'
+  - 'services/*' 

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package auth;
+
+service AuthService {
+  rpc GetAuth (GetAuthRequest) returns (GetAuthResponse);
+}
+
+message GetAuthRequest {
+  string query = 1;
+}
+
+message GetAuthResponse {
+  string message = 1;
+} 

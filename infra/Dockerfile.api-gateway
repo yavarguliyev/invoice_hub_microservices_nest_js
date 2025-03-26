@@ -1,0 +1,53 @@
+# Build stage
+FROM node:20-alpine AS build
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY common/package.json ./common/
+COPY api-gateway/package.json ./api-gateway/
+
+# Install dependencies
+RUN npm install -g pnpm
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY tsconfig.base.json ./
+COPY common/ ./common/
+COPY api-gateway/ ./api-gateway/
+
+# Build the common library first
+RUN cd common && pnpm build
+
+# Build the API Gateway
+RUN cd api-gateway && pnpm build
+
+# Production stage
+FROM node:20-alpine AS production
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY common/package.json ./common/
+COPY api-gateway/package.json ./api-gateway/
+
+# Install production dependencies only
+RUN npm install -g pnpm
+RUN pnpm install --frozen-lockfile --prod
+
+# Copy compiled code from build stage
+COPY --from=build /app/common/dist ./common/dist
+COPY --from=build /app/api-gateway/dist ./api-gateway/dist
+
+# Set environment variables
+ENV NODE_ENV=production
+
+# Expose the service port
+EXPOSE 3000
+
+# Command to run the application
+CMD ["node", "api-gateway/dist/main.js"] 

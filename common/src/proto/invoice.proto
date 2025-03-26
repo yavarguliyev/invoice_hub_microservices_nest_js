@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package invoice;
+
+service InvoiceService {
+  rpc GetInvoices (GetInvoicesRequest) returns (GetInvoicesResponse);
+}
+
+message GetInvoicesRequest {
+  string query = 1;
+}
+
+message GetInvoicesResponse {
+  string message = 1;
+} 

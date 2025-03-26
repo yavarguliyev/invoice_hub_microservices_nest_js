@@ -1,0 +1,34 @@
+# Dependency directories
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Development
+.git/
+.github/
+.vscode/
+.idea/
+*.log
+.env
+.env.*
+!.env.example
+
+# Tests
+test/
+coverage/
+*.spec.ts
+*.test.ts
+
+# Other
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+README.md
+.editorconfig
+.prettierrc
+.eslintrc 
