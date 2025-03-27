@@ -19,35 +19,35 @@ export class AppController implements OnModuleInit {
   private invoiceService: InvoiceService;
   private orderService: OrderService;
 
-  constructor(
+  constructor (
     @Inject('AUTH_SERVICE') private readonly authClient: ClientGrpcProxy,
     @Inject('INVOICE_SERVICE') private readonly invoiceClient: ClientGrpcProxy,
     @Inject('ORDER_SERVICE') private readonly orderClient: ClientGrpcProxy,
   ) {}
 
-  onModuleInit() {
+  onModuleInit () {
     this.authService = this.authClient.getService<AuthService>('AuthService');
     this.invoiceService = this.invoiceClient.getService<InvoiceService>('InvoiceService');
     this.orderService = this.orderClient.getService<OrderService>('OrderService');
   }
 
   @Get()
-  getHello(): string {
+  getHello (): string {
     return 'API Gateway is running!';
   }
 
   @Get('auth')
-  async getAuth() {
+  async getAuth () {
     return this.authService.getAuth({ query: 'hello' });
   }
 
   @Get('invoices')
-  async getInvoices() {
+  async getInvoices () {
     return this.invoiceService.getInvoices({ query: 'hello' });
   }
 
   @Get('orders')
-  async getOrders() {
+  async getOrders () {
     return this.orderService.getOrders({ query: 'hello' });
   }
 }

@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: invoice-hub
+  labels:
+    app: auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      containers:
+      - name: auth-service
+        image: invoice-hub/auth-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3001
+          name: grpc
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+        env:
+          - name: PORT
+            value: "3001"
+          - name: GRPC_VERBOSITY
+            value: DEBUG
+          - name: GRPC_TRACE
+            value: client_channel,resolver
+          - name: GRPC_DNS_RESOLVER
+            value: native
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: invoice-hub
+  annotations:
+    cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
+spec:
+  type: NodePort
+  ports:
+    - port: 3001
+      targetPort: 3001
+      nodePort: 30001
+      protocol: TCP
+      name: grpc
+  selector:
+    app: auth-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service-headless
+  namespace: invoice-hub
+  annotations:
+    cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
+spec:
+  clusterIP: None
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: grpc
+  selector:
+    app: auth-service 

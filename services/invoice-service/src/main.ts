@@ -2,14 +2,19 @@ import { NestFactory } from '@nestjs/core';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { Logger } from '@nestjs/common';
 import { PROTO_PATHS } from '@invoice-hub/common';
+import { ConfigService } from '@nestjs/config';
 
 import { AppModule } from './app.module';
 
-async function bootstrap() {
+async function bootstrap () {
   const logger = new Logger('Bootstrap');
-  const port = 3002;
+  const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('PORT', 3002);
+
+  await app.close();
   
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+  const microservice = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
     {
       transport: Transport.GRPC,
@@ -21,7 +26,7 @@ async function bootstrap() {
     },
   );
 
-  await app.listen();
+  await microservice.listen();
   logger.log(`Invoice service running on port ${port}`);
 }
 

@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: invoice-hub
+  labels:
+    app: order-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+      - name: order-service
+        image: invoice-hub/order-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3003
+          name: grpc
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+        env:
+          - name: PORT
+            value: "3003"
+          - name: GRPC_VERBOSITY
+            value: DEBUG
+          - name: GRPC_TRACE
+            value: client_channel,resolver
+          - name: GRPC_DNS_RESOLVER
+            value: native
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: invoice-hub
+  annotations:
+    cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
+spec:
+  type: NodePort
+  ports:
+    - port: 3003
+      targetPort: 3003
+      nodePort: 30003
+      protocol: TCP
+      name: grpc
+  selector:
+    app: order-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service-headless
+  namespace: invoice-hub
+  annotations:
+    cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
+spec:
+  clusterIP: None
+  ports:
+    - port: 3003
+      targetPort: 3003
+      protocol: TCP
+      name: grpc
+  selector:
+    app: order-service 
