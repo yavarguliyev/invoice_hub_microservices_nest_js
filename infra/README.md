@@ -159,4 +159,4 @@ kill <PORT_FORWARDING_PID>
 
 2. Ingress deployment may fail in Docker Desktop Kubernetes
    - Ingress deployment is disabled by default
-   - Use the `--with-ingress` flag to attempt ingress deployment 
+   - Use the `--with-ingress` flag to attempt ingress deployment
